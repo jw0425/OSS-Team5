@@ -1,268 +1,351 @@
-#include <stdio.h>
-#include <stdlib.h>
+﻿#include <stdio.h>
 
-#define N 9
+#define Size 3
 
-enum { O,X,EMPTY };
+#define FALSE 0
+#define TRUE 1
 
+#define WIN 10
+#define LOSE -10
+#define DRAW 0
+
+enum { O, X, EMPTY };
 int HUMAN = 0;
 int COMP = 1;
 
-// initialize the borad with empty cells
-void initBoard(int board[]) {
-
-	for(int i=0; i<N; i++)
-		board[i] = EMPTY;
+//보드 내부의 모든 원소를 EMPTY로 초기화
+void initBoard(int Board[][Size])
+{
+	for (int i = 0; i < Size; i++)
+	{
+		for (int j = 0; j < Size; j++)
+		{
+			Board[i][j] = EMPTY;
+		}
+	}
 }
 
-// print the board on console
-void printBoard(const int board[]) {
-
+// 보드판 출력
+void printBoard(const int Board[][Size])
+{
 	char symbol[] = { 'O','X','-' };
 
-	printf("\n  BOARD\n\n");
-	for(int i=0; i<N; i++) {
-		if(i != 0 && i%3 == 0)
-			printf("\n\n");
-		printf(" %c ",symbol[board[i]]);
+	printf_s("\n  BOARD\n\n");
+
+	for (int i = 0; i < Size; i++)
+	{
+		for (int j = 0; j < Size; j++)
+		{
+			printf_s("%c ", symbol[Board[i][j]]);
+		}
+		printf("\n");
 	}
-	printf("\n\n");
+
+	printf_s("\n\n");
 }
 
-// checks if the board is full or not
-// returns 1(true) if full
-// returns 0(false) if even one cell is empty
-int isBoardFull(const int board[]) {
+//보드가 다 찼는지의 유무를 반환
+int isBoardFull(const int Board[][Size]) 
+{
+	for (int i = 0;i < Size; i++)
+	{
+		for (int j = 0; j < Size; j++)
+		{
+			if (Board[i][j] == EMPTY)
+			{
+				return FALSE;
+			}
+		}
+	}
 
-	for(int i=0; i<N; i++)
-		if(board[i] == EMPTY)
-			return 0;
-	return 1;
+	return TRUE;
 }
 
-// makes a move on the given cell by given side
-void makeMove(int board[], const int cell, const int side) {
-	board[cell] = side;
+// 플레이어가 선택한 곳을 보드에 기입
+void makeMove(int Board[][Size], int Col, int Row, const int Player) 
+{
+	Board[Col][Row] = Player; 
 }
 
 
-// checks if a 3 is formed by a side
-// returns 1 if yes
-// returns 0 if no
-int is3inARow(const int board[], const int side) {
+/*
+연속된 3개의 플레이어 심볼 확인
+일치 : 1(TRUE) 반환
+불일치 : 0(FLASE) 반환
+*/
+int is3inARow(const int Board[][Size], const int Player) 
+{
+	int rowCount = 0;
+	int columnCnt = 0;
+	int downDiagonalCnt = 0;
+	int upDiagonalCnt = 0;
+	
+	for (int i = 0; i < Size; i++)
+	{
+		rowCount = 0;
+		columnCnt = 0;
 
-	// horizontal
-	if(board[0] == side && board[1] == side && board[2] == side)
-		return 1;
-	if(board[3] == side && board[4] == side && board[5] == side)
-		return 1;
-	if(board[6] == side && board[7] == side && board[8] == side)
-		return 1;
+		for (int j = 0; j < Size; j++)
+		{
+			if (Board[i][j] == Player)
+			{
+				rowCount++;
+			}
+			if (Board[j][i] == Player)
+			{
+				columnCnt++;
+			}
+			if (i == j)
+			{
+				if (Board[i][j] == Player)
+					downDiagonalCnt++;
+			}
 
-	// vertical
-	if(board[0] == side && board[3] == side && board[6] == side)
-		return 1;
-	if(board[1] == side && board[4] == side && board[7] == side)
-		return 1;
-	if(board[2] == side && board[5] == side && board[8] == side)
-		return 1;
+			if (i + j + 1 == Size)
+			{
+				if (Board[i][j] == Player)
+				{
+					upDiagonalCnt++;
+				}
+			}
+		}
+		if (rowCount == Size || columnCnt == Size || downDiagonalCnt == Size || upDiagonalCnt == Size)
+			return TRUE;
+	}
 
-	// diagonal
-	if(board[0] == side && board[4] == side && board[8] == side)
-		return 1;
-	if(board[2] == side && board[4] == side && board[6] == side)
-		return 1;
-
-	return 0;
+	return FALSE;
 }
 
-// returns score for side
-// +10 if particular side wins
-// -10 if particular side loses
-//  0 if draw or not yet complete
-int isAWin(const int board[], const int side) {
+/*
+자신이 이길경우 10점
+상대방이 이길경우 -10점
+비길경우 0점
+*/
+int isAWin(const int Board[][Size], const int Player) 
+{
+	if (is3inARow(Board, Player)) // 이기는 경우
+	{
+		return WIN;
+	}
 
-	if(is3inARow(board,side))
-		return 10;
-	if(is3inARow(board,!side))
-		return -10;
-	return 0;
+	if (is3inARow(Board, !Player)) // 상대방이 이기는 경우
+	{
+		return LOSE;
+	}
+
+	return DRAW; // 비기는 경우
 }
 
-// returns which moves gives the maximum score
-int max(int *scoreList,int moveCount,int *moveList,int *bestMove) {
-    
-    if(!moveCount)
-    	return 0;
+// 최적의 좌표의 점수 중 가장 큰 값을 반환 == 이길 확률이 높은 좌표
+int max(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
+{
+	if (!emptyCellCount)
+	{
+		return 0;
+	}
 
-    int max = -20;
-    
-    for(int i=0;i<moveCount;i++) {
-        if(scoreList[i] > max) {
-            max = scoreList[i];
-            *bestMove = moveList[i];
-        }
-    }
-    return max;
+	int max = -20;
+
+	for (int i = 0;i < emptyCellCount;i++)
+	{
+		if (scoreList[i] > max)
+		{
+			max = scoreList[i];
+			*bestMove = emptyCellList[i];
+		}
+	}
+	return max;
 }
 
-// returns which moves gives the minimum score
-int min(int *scoreList,int moveCount,int *moveList,int *bestMove) {
-    
-    if(!moveCount)
-    	return 0;
+// 최적의 좌표의 점수 중 가장 작은 값을 반환 == 이길 확률이 가장 낮은 좌표
+int min(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
+{
+	if (!emptyCellCount)
+	{
+		return 0;
+	}
 
-    int min = +20;
-    
-    for(int i=0;i<moveCount;i++) {
-        if(scoreList[i] < min) {
-            min = scoreList[i];
-            *bestMove = moveList[i];
-        }
-    }
-    return min;
+	int min = +20;
+
+	for (int i = 0;i < emptyCellCount;i++)
+	{
+		if (scoreList[i] < min) 
+		{
+			min = scoreList[i];
+			*bestMove = emptyCellList[i];
+		}
+	}
+	return min;
 }
 
-int minMax(int board[], int side, int *depth) {
-
-	int moveList[N];
-	int moveCount = 0;
-	int bestMove;
-	int scoreList[N];
+//컴퓨터가 최선의 수를 찾을 수 있도록 함수
+int minMax(int Board[][Size], int Player, int* depth) 
+{
+	int emptyCellList[Size*Size];
+	int emptyCellCount = 0;
+	int bestPosition = 0;
+	int scoreList[Size* Size];
 	int bestScore;
 
-	bestScore = isAWin(board,COMP);
-	if(bestScore)
+	bestScore = isAWin(Board, COMP);  // 컴퓨터의 승,무,패 확인해서 해당하는 값을 bestScore에 넣음
+	
+	if (bestScore) //bestScore가 정수이므로 0이 아니면 true, 컴퓨터가 승리 또는 패배 했을 때만 return
+	{
 		return bestScore - *depth;
-
-	// fill the moveList[]
-	for(int i=0;i<N;i++) {
-		if(board[i] == EMPTY)
-			moveList[moveCount++] = i;
 	}
 
-	// loop through all moves
-	int move;
-	for(int i=0;i<moveCount;i++) {
+	for (int i = 0;i < Size;i++)
+	{
+		for (int j = 0; j < Size; j++)
+		{
+			if (Board[i][j] == EMPTY)
+				emptyCellList[emptyCellCount++] = i * Size + j; 
+		}
+	}
 
-		move = moveList[i];
-		makeMove(board,move,side);
+	int CurPosition;
+	for (int i = 0;i < emptyCellCount;i++)
+	{
+		CurPosition = emptyCellList[i];
+		makeMove(Board, CurPosition /Size, CurPosition % Size, Player);
 
 		(*depth)++;
-		scoreList[i] = minMax(board,!side,depth);
+		scoreList[i] = minMax(Board, !Player, depth);
 		(*depth)--;
 
-		makeMove(board,move,EMPTY);
+		makeMove(Board, CurPosition / Size, CurPosition % Size, EMPTY);
 	}
 
-	if(side == COMP) {
-		// MAX
-		bestScore = max(scoreList,moveCount,moveList,&bestMove);
-	}
-	if(side == HUMAN) {
-		// MIN
-		bestScore = min(scoreList,moveCount,moveList,&bestMove);
+	if (Player == COMP) 
+	{
+		// 컴퓨터 차례일 때는 컴퓨터의 최선의 수를 찾기 위해 max함수 호출
+		bestScore = max(scoreList, emptyCellCount, emptyCellList, &bestPosition);
 	}
 
-	if(*depth != 0)
-        return bestScore;
-    else
-        return bestMove;
+	if (Player == HUMAN) 
+	{
+		// 사람(사용자)입장에서는 컴퓨터가 최선의 수를 내면 안되니 min함수 호출
+		bestScore = min(scoreList, emptyCellCount, emptyCellList, &bestPosition);
+	}
+
+	if (*depth != 0) // 재귀가 아직 끝나지 않았다면 bestScore 반환
+	{
+		return bestScore;
+	}
+	else //재귀가 끝났으면 최선의 위치를 반환 해야되므로 bestMove 반환
+	{
+		return bestPosition;
+	}
 }
 
-int getComputerMove(int *board,int side) {
-
-    int depth = 0;
-    int bestMove = minMax(board,side,&depth);
-    printf("Searched.... bestMove: %d\n",bestMove+1);
-    return bestMove;
+// 컴퓨터 차례
+void ComputerTurn(int Board[][Size], int Player) 
+{
+	int depth = 0;
+	int bestPos = minMax(Board, Player, &depth); // 최선의 위치 선택
+	printf_s("Searched.... bestMove: %d\n", bestPos + 1);
+	makeMove(Board, bestPos/Size, bestPos%Size, COMP);
 }
 
-int getHumanMove(const int *board) {
-
-	printf("\nEnter your move !!\n\n");
-	int move;
-	while(1) {
-
-		scanf("%d",&move);
-		if(board[move-1] == EMPTY && move >=0 && move <=9)
+//사람 차례
+void HumanTurn(int Board[][Size]) 
+{
+	printf_s("\nEnter your move !!\n\n");
+	int inputCol, inputRow;
+	while (1) 
+	{
+		scanf_s("%d %d", &inputCol, &inputRow);
+		if (Board[inputCol][inputRow] == EMPTY)
+		{
 			break;
+		}
 		else
-			printf("try again : ");
+		{
+			printf_s("try again : ");
+		}
 	}
-	return move-1;
+	makeMove(Board, inputCol, inputRow, HUMAN);
 }
 
-void runGame() {
+//게임 실행
+void runGame(void)
+{
+	printf_s("\nChoose X or O. O moves first !!\n\n");
+	while (1) 
+	{
 
-	printf("\nChoose X or O. O moves first !!\n\n");
-	while(1) {
-		
-		char choice = getchar();
+		char choice;
+		scanf_s("%c", &choice, sizeof(char));
+
 		getchar();
-		if(choice == 'O') {
+
+		if (choice == 'O') 
+		{
 			HUMAN = O;
 			COMP = X;
 			break;
 		}
-		if(choice == 'X') {
+
+		if (choice == 'X') 
+		{
 			HUMAN = X;
 			COMP = O;
 			break;
 		}
-		else {
-			printf("Choose correct symbols\n");
+		else 
+		{
+			printf_s("Choose correct symbols\n");
 		}
 	}
 
 	int gameOver = 0;
-	int side = O;
-	int move;
-	int board[N];
+	int Player = O;
+	int Board[Size][Size];
 
-	initBoard(board);
-	printBoard(board);
+	initBoard(Board);
+	printBoard(Board);
 
-	while(!gameOver) {
+	while (!gameOver) 
+	{
 
-		if(side == HUMAN) {
-			//Human Move
-			move = getHumanMove(board);
-			makeMove(board,move,side);
-			printBoard(board);
+		if (Player == HUMAN)
+		{
+			HumanTurn(Board);
 		}
-		else {
-			//Computer Move
-			move = getComputerMove(board,side);
-			makeMove(board,move,side);
-			printBoard(board);
+		else 
+		{
+			ComputerTurn(Board, Player);
 		}
 
+		printBoard(Board);
 
-		//WIN
-		if(is3inARow(board,side)) {
-			printf("Game Over\n");
+		if (is3inARow(Board, Player)) 
+		{
+			printf_s("Game Over\n");
 			gameOver = 1;
-			if(side == COMP)
-				printf("Computer Wins\n");
+			if (Player == COMP)
+			{
+				printf_s("Computer Wins\n");
+			}
 			else
-				printf("Human Wins\n");
+			{
+				printf_s("Human Wins\n");
+			}
 		}
 
-		//DRAW
-		if(isBoardFull(board)) {
-			printf("Game Over\n");
+		if (isBoardFull(Board)) 
+		{
+			printf_s("Game Over\n");
 			gameOver = 1;
-			printf("It's a Draw\n");
+			printf_s("It's a Draw\n");
 		}
 
-		side = !side;
-
+		Player = !Player;
 	}
 }
 
-int main(int argc, char *argv[]) {
-
+int main(void) 
+{
 	runGame();
 
 	return 0;
