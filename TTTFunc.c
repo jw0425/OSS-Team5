@@ -236,7 +236,7 @@ void ComputerTurn(int Board[][A_SIZE], int Player)
 }
 
 //사람 차례
-void HumanTurn(int Board[][A_SIZE])
+void HumanTurn(int Board[][A_SIZE], const int player)
 {
 	printf_s("\nEnter your move !!\n\n");
 	int inputCol, inputRow;
@@ -252,13 +252,13 @@ void HumanTurn(int Board[][A_SIZE])
 			printf_s("try again : ");
 		}
 	}
-	makeMove(Board, inputCol, inputRow, HUMAN);
+	makeMove(Board, inputCol, inputRow, player);
 }
 
 
 
 //게임 실행
-void runGame(void)
+void runGameVSCom(void)
 {
 	int Player = 0;
 
@@ -300,7 +300,7 @@ void runGame(void)
 
 		if (Player == HUMAN)
 		{
-			HumanTurn(Board);
+			HumanTurn(Board, Player);
 		}
 		else
 		{
@@ -332,4 +332,80 @@ void runGame(void)
 
 		Player = !Player;
 	}
+}
+
+void runGameVSHuman(void)
+{
+	int Player = 0;
+
+	int gameOver = 0;
+	int Board[A_SIZE][A_SIZE];
+
+	initBoard(Board);
+	printBoard(Board);
+
+	while (!gameOver)
+	{
+
+		if (Player == HUMAN)
+		{
+			//Player1의 차례
+			printf_s("Player1의 차례입니다.\n");
+			HumanTurn(Board, Player);
+		}
+		else
+		{
+			//Player2의 차례
+			printf_s("Player2의 차례입니다.\n");
+			HumanTurn(Board, Player);
+		}
+
+		printBoard(Board);
+
+		if (is3inARow(Board, Player))
+		{
+			printf_s("Game Over\n");
+			gameOver = 1;
+			if (Player == COMP)
+			{
+				printf_s("Player2 Wins\n");
+			}
+			else
+			{
+				printf_s("Player1 Wins\n");
+			}
+		}
+
+		if (isBoardFull(Board))
+		{
+			printf_s("Game Over\n");
+			gameOver = 1;
+			printf_s("It's a Draw\n");
+		}
+
+		Player = !Player;
+	}
+}
+
+void showMenu()
+{
+	printf("\n\n\n\t\tTicTacToe Game\n\n");
+	printf("\t\t  모드를 선택해 주세요.\n\n");
+	printf("\t\t  1. Player VS Player\n");
+	printf("\t\t  2. Player VS Computer\n");
+	
+	int choice;
+	scanf("%d", &choice);
+	getchar();
+	
+	while (!(choice == 1 || choice == 2)) { // choice가 1또는 2가 아니라면
+		printf("1또는 2를 선택해주세요!\n");
+		scanf("%d", &choice);
+		getchar();
+	}
+	
+	if (choice == 1)
+		runGameVSHuman();
+	else // choice = 2
+		runGameVSCom();
 }

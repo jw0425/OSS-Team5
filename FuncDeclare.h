@@ -14,6 +14,8 @@ int max(int[], int, int[], int*);
 int min(int[], int, int[], int*);
 int minMax(int[][A_SIZE], int, int*);
 void ComputerTurn(int[][A_SIZE], int);
-void HumanTurn(int[][A_SIZE]);
-void runGame(void);
+void HumanTurn(int[][A_SIZE], const int);
+void runGameVSCom(void);
+void runGameVSHuman(void);
+void showMenu(void);
 #endif
