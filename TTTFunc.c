@@ -15,19 +15,45 @@ void initBoard(int Board[][A_SIZE])
 }
 
 // 보드판 출력
-void printBoard(const int Board[][A_SIZE])
+void printBoard(int Board[][A_size])
 {
-	char symbol[] = { 'O','X','-' };
+	int widthHeight = 6;
+	char X[6][6] = { "X    X"," X  X ","  XX  ","  XX  " ," X  X " ,"X    X" };
+	char O[6][6] = { " OOOO ","OO  OO","O    O" ,"O    O","OO  OO" ," OOOO " };
+	char nothing[6][6] = { "      ","      "," ==== "," ==== ","      ","      " };
+	
 
-	printf_s("\n  BOARD\n\n");
+	printf_s("\n               BOARD\n\n");
+	printf_s("     1        2        3\n\n");
+	printf_s("    ---------------------------\n");
 
-	for (int i = 0; i < A_SIZE; i++)
+	for (int i = 0; i < A_size; i++)
 	{
-		for (int j = 0; j < A_SIZE; j++)
+		for (int l = 0; l < widthHeight; l++)
 		{
-			printf_s("%c ", symbol[Board[i][j]]);
+			if (l == 0) { printf_s(" %d  |", i+1); }
+			else { printf_s("    |"); }
+
+			for (int j = 0; j < A_size; j++)
+			{
+				int status = Board[i][j];
+
+				for (int k = 0; k < widthHeight; k++) {
+					if (status == 0) {
+						printf_s("%c", O[l][k]);
+					}
+					else if (status == 1) {
+						printf_s("%c", X[l][k]);
+					}
+					else {
+						printf_s("%c", nothing[l][k]);
+					}
+				}
+				printf_s(" | ");
+			}
+			printf_s("\n");
 		}
-		printf("\n");
+		printf_s("    ---------------------------\n");
 	}
 
 	printf_s("\n\n");
