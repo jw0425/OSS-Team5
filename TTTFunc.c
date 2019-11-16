@@ -390,9 +390,9 @@ void runGameVSHuman(void)
 void showMenu()
 {
 	printf("\n\n\n\t\tTicTacToe Game\n\n");
-	printf("\t\t  모드를 선택해 주세요.\n\n");
-	printf("\t\t  1. Player VS Player\n");
-	printf("\t\t  2. Player VS Computer\n");
+	printf("\t     모드를 선택해 주세요.\n\n");
+	printf("\t      1. Player VS Player\n");
+	printf("\t      2. Player VS Computer\n");
 	
 	int choice;
 	scanf("%d", &choice);
