@@ -1,6 +1,58 @@
 #include <stdio.h>
+#include <time.h>
 #include "basedef.h"
 #include "FuncDeclare.h"
+
+void rankingPrint() {
+
+	FILE *fp = NULL;
+
+	char symbol[2] = { 'W','D' };
+	char name[255];
+	double time;
+	int status;
+
+
+	fp = fopen_s(&fp, "log.txt", "r");
+
+	if (fp == NULL) { printf_s("NO RANKING\n"); }
+	else {
+		while (feof(fp) != EOF) {
+			fscanf_s("%f %d %s", &time, &status, name);
+			printf_s("%c %f %s\n", symbol[status - 1], time, name);
+		}
+		fclose(fp);
+	}
+
+
+}
+
+void rankingInsert(double time, int status) {
+
+	char name[255];
+	FILE *fp = NULL;
+
+
+	if (status == 0) {
+		//진거면 아무것도 실행 안함
+	}
+	else if (status == 1) {
+		//이겼을시
+
+
+		printf_s("\ntime = %0.0f\n", time);
+		printf_s("insert name : ");
+		scanf_s("%s", name);
+
+	}
+	else if (status == 2) {
+		//비겼을시
+	}
+	else {
+		printf_s("ERROR");
+	}
+
+}
 
 //보드 내부의 모든 원소를 EMPTY로 초기화
 void initBoard(int Board[][A_SIZE])
@@ -21,7 +73,7 @@ void printBoard(int Board[][A_SIZE])
 	char X[6][6] = { {"X    X"},{" X  X "},{"  XX  "},{"  XX  "} ,{" X  X "} ,{"X    X"} };
 	char O[6][6] = { {" OOOO "},{"OO  OO"},{"O    O"} ,{"O    O"},{"OO  OO"} ,{" OOOO "} };
 	char nothing[6][6] = { {"      "},{"      "},{" ==== "},{" ==== "},{"      "},{"      "} };
-	
+
 
 	printf_s("\n               BOARD\n\n");
 	printf_s("     1        2        3\n\n");
@@ -31,7 +83,7 @@ void printBoard(int Board[][A_SIZE])
 	{
 		for (int l = 0; l < widthHeight; l++)
 		{
-			if (l == 0) { printf_s(" %d  |", i+1); }
+			if (l == 0) { printf_s(" %d  |", i + 1); }
 			else { printf_s("    |"); }
 
 			for (int j = 0; j < A_SIZE; j++)
@@ -62,7 +114,7 @@ void printBoard(int Board[][A_SIZE])
 //보드가 다 찼는지의 유무를 반환
 int isBoardFull(const int Board[][A_SIZE])
 {
-	for (int i = 0;i < A_SIZE; i++)
+	for (int i = 0; i < A_SIZE; i++)
 	{
 		for (int j = 0; j < A_SIZE; j++)
 		{
@@ -187,6 +239,8 @@ void runGame(void)
 {
 	int Player = 0;
 
+	rankingPrint();
+
 	printf_s("\nChoose X or O. O moves first !!\n\n");
 	while (1)
 	{
@@ -214,11 +268,19 @@ void runGame(void)
 		}
 	}
 
+
+
 	int gameOver = 0;
 	int Board[A_SIZE][A_SIZE];
+	int startTime;
+	int endTime;
+	int status = -1;
 
 	initBoard(Board);
 	printBoard(Board);
+
+	//랭킹 시간 시작
+	startTime = clock();
 
 	while (!gameOver)
 	{
@@ -241,10 +303,12 @@ void runGame(void)
 			if (Player == COMP)
 			{
 				printf_s("Computer Wins\n");
+				status = 0;
 			}
 			else
 			{
 				printf_s("Human Wins\n");
+				status = 1;
 			}
 		}
 
@@ -253,8 +317,14 @@ void runGame(void)
 			printf_s("Game Over\n");
 			gameOver = 1;
 			printf_s("It's a Draw\n");
+			status = 2;
 		}
 
 		Player = !Player;
 	}
+
+	//랭킹 시간 끝
+	endTime = clock();
+
+	rankingInsert((endTime - startTime) / CLOCKS_PER_SEC, status);
 }
