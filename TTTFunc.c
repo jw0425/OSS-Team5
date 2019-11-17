@@ -14,6 +14,7 @@ void initBoard(int Board[][A_SIZE])
 	}
 }
 
+
 // 보드판 출력
 void printBoard(const int Board[][A_SIZE])
 {
@@ -33,6 +34,8 @@ void printBoard(const int Board[][A_SIZE])
 	printf_s("\n\n");
 }
 
+
+
 //보드가 다 찼는지의 유무를 반환
 int isBoardFull(const int Board[][A_SIZE])
 {
@@ -49,6 +52,8 @@ int isBoardFull(const int Board[][A_SIZE])
 
 	return TRUE;
 }
+
+
 
 // 플레이어가 선택한 곳을 보드에 기입
 void makeMove(int Board[][A_SIZE], int Col, int Row, const int Player)
@@ -124,113 +129,36 @@ int isAWin(const int Board[][A_SIZE], const int Player)
 
 	return DRAW; // 비기는 경우
 }
-// 최적의 좌표의 점수 중 가장 큰 값을 반환 == 이길 확률이 높은 좌표
-int max(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
-{
-	if (!emptyCellCount)
-	{
-		return 0;
-	}
 
-	int max = -20;
 
-	for (int i = 0;i < emptyCellCount;i++)
-	{
-		if (scoreList[i] > max)
-		{
-			max = scoreList[i];
-			*bestMove = emptyCellList[i];
-		}
-	}
-	return max;
-}
-
-// 최적의 좌표의 점수 중 가장 작은 값을 반환 == 이길 확률이 가장 낮은 좌표
-int min(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
-{
-	if (!emptyCellCount)
-	{
-		return 0;
-	}
-
-	int min = +20;
-
-	for (int i = 0;i < emptyCellCount;i++)
-	{
-		if (scoreList[i] < min)
-		{
-			min = scoreList[i];
-			*bestMove = emptyCellList[i];
-		}
-	}
-	return min;
-}
-
-//컴퓨터가 최선의 수를 찾을 수 있도록 함수
-int minMax(int Board[][A_SIZE], int Player, int* depth)
-{
-	int emptyCellList[A_SIZE * A_SIZE];
-	int emptyCellCount = 0;
-	int bestPosition = 0;
-	int scoreList[A_SIZE * A_SIZE];
-	int bestScore;
-
-	bestScore = isAWin(Board, COMP);  // 컴퓨터의 승,무,패 확인해서 해당하는 값을 bestScore에 넣음
-
-	if (bestScore) //bestScore가 정수이므로 0이 아니면 true, 컴퓨터가 승리 또는 패배 했을 때만 return
-	{
-		return bestScore - *depth;
-	}
-
-	for (int i = 0;i < A_SIZE;i++)
-	{
-		for (int j = 0; j < A_SIZE; j++)
-		{
-			if (Board[i][j] == EMPTY)
-				emptyCellList[emptyCellCount++] = i * A_SIZE + j;
-		}
-	}
-
-	int CurPosition;
-	for (int i = 0;i < emptyCellCount;i++)
-	{
-		CurPosition = emptyCellList[i];
-		makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, Player);
-
-		(*depth)++;
-		scoreList[i] = minMax(Board, !Player, depth);
-		(*depth)--;
-
-		makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, EMPTY);
-	}
-
-	if (Player == COMP)
-	{
-		// 컴퓨터 차례일 때는 컴퓨터의 최선의 수를 찾기 위해 max함수 호출
-		bestScore = max(scoreList, emptyCellCount, emptyCellList, &bestPosition);
-	}
-
-	if (Player == HUMAN)
-	{
-		// 사람(사용자)입장에서는 컴퓨터가 최선의 수를 내면 안되니 min함수 호출
-		bestScore = min(scoreList, emptyCellCount, emptyCellList, &bestPosition);
-	}
-
-	if (*depth != 0) // 재귀가 아직 끝나지 않았다면 bestScore 반환
-	{
-		return bestScore;
-	}
-	else //재귀가 끝났으면 최선의 위치를 반환 해야되므로 bestMove 반환
-	{
-		return bestPosition;
-	}
-}
 
 // 컴퓨터 차례
-void ComputerTurn(int Board[][A_SIZE], int Player)
+void ComputerTurn(int Board[][A_SIZE], int Player , int level)
 {
 	int depth = 0;
-	int bestPos = minMax(Board, Player, &depth); // 최선의 위치 선택
+	int bestPos;
+
+	switch (level)
+	{
+	case 1:
+		bestPos = minMax_EASY(Board, Player); // 최선의 위치 선택
+		break;
+
+	case 2:
+		bestPos = minMax_NORMAL(Board, Player, &depth); // 최선의 위치 선택
+		break;
+
+	case 3:
+		bestPos= minMax_HARD(Board, Player, &depth); // 최선의 위치 선택
+		break;
+
+	default:
+		printf("System Error\n");
+		bestPos = ERROR;
+		break;
+	}
+
+
 	printf_s("Searched.... bestMove: %d\n", bestPos + 1);
 	makeMove(Board, bestPos / A_SIZE, bestPos % A_SIZE, COMP);
 }
@@ -261,11 +189,28 @@ void HumanTurn(int Board[][A_SIZE])
 void runGame(void)
 {
 	int Player = 0;
+	int level;
 
+	while (1)
+	{
+		
+		printf_s("\nChoose your level!!\n| 1 | 2 | 3 |\n");
+		scanf_s("%d", &level);
+		
+		if (level >= 1 && level <= 3)
+		{
+			break;
+		}
+
+		else
+		{
+			printf("Choose correct level\n");
+		}
+	}
 	printf_s("\nChoose X or O. O moves first !!\n\n");
 	while (1)
 	{
-
+		getchar();
 		char choice;
 		scanf_s("%c", &choice, sizeof(char));
 
@@ -304,7 +249,7 @@ void runGame(void)
 		}
 		else
 		{
-			ComputerTurn(Board, Player);
+			ComputerTurn(Board, Player,level);
 		}
 
 		printBoard(Board);
