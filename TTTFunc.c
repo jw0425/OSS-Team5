@@ -184,6 +184,9 @@ void ComputerTurn(int Board[][A_SIZE], int Player, int level)
 		break;
 	}
 
+	makeMove(Board, bestPos/A_SIZE, bestPos%A_SIZE, Player);
+	
+
 }
 
 
@@ -223,7 +226,7 @@ void runGameVSCom(void)
 		printf("\t난이도를 선택해주세요!!\n");
 		printf("\t      1. 초급\n");
 		printf("\t      2. 중급\n");
-		printf("\t      2. 고급\n");
+		printf("\t      3. 고급\n");
 		scanf_s("%d", &level);
 		
 		
