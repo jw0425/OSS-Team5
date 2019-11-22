@@ -16,19 +16,45 @@ void initBoard(int Board[][A_SIZE])
 
 
 // 보드판 출력
-void printBoard(const int Board[][A_SIZE])
+void printBoard(int Board[][A_SIZE])
 {
-	char symbol[] = { 'O','X','-' };
+	int widthHeight = 6;
+	char X[6][6] = { {"X    X"},{" X  X "},{"  XX  "},{"  XX  "} ,{" X  X "} ,{"X    X"} };
+	char O[6][6] = { {" OOOO "},{"OO  OO"},{"O    O"} ,{"O    O"},{"OO  OO"} ,{" OOOO "} };
+	char nothing[6][6] = { {"      "},{"      "},{" ==== "},{" ==== "},{"      "},{"      "} };
+	
 
-	printf_s("\n  BOARD\n\n");
+	printf_s("\n               BOARD\n\n");
+	printf_s("     1        2        3\n\n");
+	printf_s("    ---------------------------\n");
 
 	for (int i = 0; i < A_SIZE; i++)
 	{
-		for (int j = 0; j < A_SIZE; j++)
+		for (int l = 0; l < widthHeight; l++)
 		{
-			printf_s("%c ", symbol[Board[i][j]]);
+			if (l == 0) { printf_s(" %d  |", i+1); }
+			else { printf_s("    |"); }
+
+			for (int j = 0; j < A_SIZE; j++)
+			{
+				int status = Board[i][j];
+
+				for (int k = 0; k < widthHeight; k++) {
+					if (status == 0) {
+						printf_s("%c", O[l][k]);
+					}
+					else if (status == 1) {
+						printf_s("%c", X[l][k]);
+					}
+					else {
+						printf_s("%c", nothing[l][k]);
+					}
+				}
+				printf_s(" | ");
+			}
+			printf_s("\n");
 		}
-		printf("\n");
+		printf_s("    ---------------------------\n");
 	}
 
 	printf_s("\n\n");
@@ -133,7 +159,7 @@ int isAWin(const int Board[][A_SIZE], const int Player)
 
 
 // 컴퓨터 차례
-void ComputerTurn(int Board[][A_SIZE], int Player , int level)
+void ComputerTurn(int Board[][A_SIZE], int Player, int level)
 {
 	int depth = 0;
 	int bestPos;
@@ -141,15 +167,15 @@ void ComputerTurn(int Board[][A_SIZE], int Player , int level)
 	switch (level)
 	{
 	case 1:
-		bestPos = minMax_EASY(Board, Player); // 최선의 위치 선택
+		bestPos = minMax_EASY(Board, Player);				//초급모드 실행
 		break;
 
 	case 2:
-		bestPos = minMax_NORMAL(Board, Player, &depth); // 최선의 위치 선택
+		bestPos = minMax_NORMAL(Board, Player, &depth);		//중급모드 실행
 		break;
 
 	case 3:
-		bestPos= minMax_HARD(Board, Player, &depth); // 최선의 위치 선택
+		bestPos = minMax_HARD(Board, Player, &depth);		//고급모드 실행
 		break;
 
 	default:
@@ -158,19 +184,19 @@ void ComputerTurn(int Board[][A_SIZE], int Player , int level)
 		break;
 	}
 
-
-	printf_s("Searched.... bestMove: %d\n", bestPos + 1);
-	makeMove(Board, bestPos / A_SIZE, bestPos % A_SIZE, COMP);
 }
 
+
+
 //사람 차례
-void HumanTurn(int Board[][A_SIZE])
+void HumanTurn(int Board[][A_SIZE], const int player)
 {
 	printf_s("\nEnter your move !!\n\n");
 	int inputCol, inputRow;
 	while (1)
 	{
 		scanf_s("%d %d", &inputCol, &inputRow);
+
 		if (Board[inputCol][inputRow] == EMPTY)
 		{
 			break;
@@ -180,33 +206,35 @@ void HumanTurn(int Board[][A_SIZE])
 			printf_s("try again : ");
 		}
 	}
-	makeMove(Board, inputCol, inputRow, HUMAN);
+	makeMove(Board, inputCol, inputRow, player);
 }
 
 
 
 //게임 실행
-void runGame(void)
+void runGameVSCom(void)
 {
 	int Player = 0;
-	int level;
+	int level = 0 ;
 
-	while (1)
+	while (level == 0)
 	{
 		
-		printf_s("\nChoose your level!!\n| 1 | 2 | 3 |\n");
+		printf("\t난이도를 선택해주세요!!\n");
+		printf("\t      1. 초급\n");
+		printf("\t      2. 중급\n");
+		printf("\t      2. 고급\n");
 		scanf_s("%d", &level);
 		
-		if (level >= 1 && level <= 3)
-		{
-			break;
-		}
+		
 
-		else
+		if(level<1 || level>3)
 		{
 			printf("Choose correct level\n");
+			level = 0;
 		}
 	}
+
 	printf_s("\nChoose X or O. O moves first !!\n\n");
 	while (1)
 	{
@@ -245,10 +273,11 @@ void runGame(void)
 
 		if (Player == HUMAN)
 		{
-			HumanTurn(Board);
+			HumanTurn(Board, Player);
 		}
 		else
 		{
+			
 			ComputerTurn(Board, Player,level);
 		}
 
@@ -277,4 +306,83 @@ void runGame(void)
 
 		Player = !Player;
 	}
+}
+
+void runGameVSHuman(void)
+{
+	int Player = 0;
+
+	int gameOver = 0;
+	int Board[A_SIZE][A_SIZE];
+
+	initBoard(Board);
+	printBoard(Board);
+
+	while (!gameOver)
+	{
+
+		if (Player == HUMAN)
+		{
+			//Player1의 차례
+			printf_s("Player1의 차례입니다.\n");
+			HumanTurn(Board, Player);
+		}
+		else
+		{
+			//Player2의 차례
+			printf_s("Player2의 차례입니다.\n");
+			HumanTurn(Board, Player);
+		}
+
+		printBoard(Board);
+
+		if (is3inARow(Board, Player))
+		{
+			printf_s("Game Over\n");
+			gameOver = 1;
+			if (Player == COMP)
+			{
+				printf_s("Player2 Wins\n");
+			}
+			else
+			{
+				printf_s("Player1 Wins\n");
+			}
+		}
+
+		if (isBoardFull(Board))
+		{
+			printf_s("Game Over\n");
+			gameOver = 1;
+			printf_s("It's a Draw\n");
+		}
+
+		Player = !Player;
+	}
+}
+
+void showMenu()
+{
+	printf("\n\n\n\t\tTicTacToe Game\n\n");
+	printf("\t     모드를 선택해 주세요.\n\n");
+	printf("\t      1. Player VS Player\n");
+	printf("\t      2. Player VS Computer\n");
+	
+	int choice;
+	scanf_s("%d", &choice);
+	getchar();
+	
+	while (!(choice == 1 || choice == 2)) { // choice가 1또는 2가 아니라면
+		printf("1또는 2를 선택해주세요!\n");
+		scanf_s("%d", &choice);
+		getchar();
+	}
+	
+	if (choice == 1)
+	{
+		
+		runGameVSHuman();
+	}
+	else // choice = 2
+		runGameVSCom();
 }

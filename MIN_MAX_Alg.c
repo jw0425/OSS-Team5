@@ -104,34 +104,6 @@ int minMax_HARD(int Board[][A_SIZE], int Player, int* depth)
 	}
 }
 
-//컴퓨터가 최선의 수를 찾을 수 있도록 함수 하난이도
-int minMax_EASY(int Board[][A_SIZE], int Player)
-{
-	int emptyCellList[A_SIZE * A_SIZE];
-	int emptyCellCount = 0;
-	int bestPosition;
-
-	srand((int)time(NULL));
-
-	
-
-	for (int i = 0; i < A_SIZE; i++)
-	{
-		for (int j = 0; j < A_SIZE; j++)
-		{
-			if (Board[i][j] == EMPTY)
-				emptyCellList[emptyCellCount++] = i * A_SIZE + j;
-		}
-	}
-
-	bestPosition = rand() % emptyCellCount;
-
-	return emptyCellList[bestPosition];
-}
-
-
-
-
 //컴퓨터가 최선의 수를 찾을 수 있도록 함수 중 난이도
 int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 {
@@ -205,12 +177,12 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 		{
 			// 컴퓨터가 이상한 값을 내게 함으로써사용자가 승리할 가능성을 올려준다.
 			bestScore = Min(scoreList, emptyCellCount, emptyCellList, &bestPosition);
-			
+
 		}
 
 		if (Player == HUMAN)
 		{
-			
+
 			bestScore = Max(scoreList, emptyCellCount, emptyCellList, &bestPosition);
 		}
 
@@ -225,3 +197,33 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 		return bestPosition;
 	}
 }
+
+//컴퓨터가 최선의 수를 찾을 수 있도록 함수 하난이도
+int minMax_EASY(int Board[][A_SIZE], int Player)
+{
+	int emptyCellList[A_SIZE * A_SIZE];
+	int emptyCellCount = 0;
+	int bestPosition;
+
+	srand((int)time(NULL));
+
+	
+
+	for (int i = 0; i < A_SIZE; i++)
+	{
+		for (int j = 0; j < A_SIZE; j++)
+		{
+			if (Board[i][j] == EMPTY)
+				emptyCellList[emptyCellCount++] = i * A_SIZE + j;
+		}
+	}
+
+	bestPosition = rand() % emptyCellCount;
+
+	return emptyCellList[bestPosition];
+}
+
+
+
+
+
