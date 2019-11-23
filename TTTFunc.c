@@ -210,6 +210,7 @@ void HumanTurn(int Board[][A_SIZE], const int player)
 		}
 	}
 	makeMove(Board, inputCol, inputRow, player);
+	system("cls");
 }
 
 
