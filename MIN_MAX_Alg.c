@@ -2,7 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-// 최적의 좌표의 점수 중 가장 큰 값을 반환 == 이길 확률이 높은 좌표
+/*
+-반환 : 이길확률이 높은 최적의 좌표값을 반환한다.
+-매개변수
+scoreList는 빈 좌표에 대해 점수를 지정한 배열이다.
+bestMove는 최적의 좌표에 대한 인덱스를 가리킨다.
+*/
 int Max(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 {
 	if (!emptyCellCount)
@@ -12,7 +17,7 @@ int Max(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 
 	int max = -20;
 
-	for (int i = 0;i < emptyCellCount;i++)
+	for (int i = 0; i < emptyCellCount; i++)
 	{
 		if (scoreList[i] > max)
 		{
@@ -23,7 +28,12 @@ int Max(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 	return max;
 }
 
-// 최적의 좌표의 점수 중 가장 작은 값을 반환 == 이길 확률이 가장 낮은 좌표
+/*
+-반환 : 이길확률이 낮은 최적의 좌표값을 반환한다.
+-매개변수
+scoreList는 빈 좌표에 대해 점수를 지정한 배열이다.
+bestMove는 최적의 좌표에 대한 인덱스를 가리킨다.
+*/
 int Min(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 {
 	if (!emptyCellCount)
@@ -33,7 +43,7 @@ int Min(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 
 	int min = +20;
 
-	for (int i = 0;i < emptyCellCount;i++)
+	for (int i = 0; i < emptyCellCount; i++)
 	{
 		if (scoreList[i] < min)
 		{
@@ -44,7 +54,14 @@ int Min(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 	return min;
 }
 
-//컴퓨터가 최선의 수를 찾을 수 있도록 함수 상난이도
+/*
+-기능 : 컴퓨터의 차례가 되면 말을 배치하는 상급난이도 함수
+-매개변수 : depth는 함수가 재귀적으로 실행될때의 재귀횟수를 저장한다.
+-반환 : 컴퓨터가 배치한 말의 인덱스를 반환한다.
+-흐름
+보드의 빈칸에 대한 정보를 저장하여 재귀적으로 사람과 컴퓨터의 말을 배치하는 과정을 반복 수행한다.
+재귀가 더이상 수행될 수 없으면 최선의 위치값을 반환한 뒤 보드를 원상태로 복구시킨다.
+*/
 int minMax_HARD(int Board[][A_SIZE], int Player, int* depth)
 {
 	int emptyCellList[A_SIZE * A_SIZE];
@@ -53,14 +70,14 @@ int minMax_HARD(int Board[][A_SIZE], int Player, int* depth)
 	int scoreList[A_SIZE * A_SIZE];
 	int bestScore;
 
-	bestScore = isAWin(Board, COMP);  // 컴퓨터의 승,무,패 확인해서 해당하는 값을 bestScore에 넣음
+	bestScore = isAWin(Board, COMP);
 
-	if (bestScore) //bestScore가 정수이므로 0이 아니면 true, 컴퓨터가 승리 또는 패배 했을 때만 return
+	if (bestScore)
 	{
 		return bestScore - *depth;
 	}
 
-	for (int i = 0;i < A_SIZE;i++)
+	for (int i = 0; i < A_SIZE; i++)
 	{
 		for (int j = 0; j < A_SIZE; j++)
 		{
@@ -70,7 +87,7 @@ int minMax_HARD(int Board[][A_SIZE], int Player, int* depth)
 	}
 
 	int CurPosition;
-	for (int i = 0;i < emptyCellCount;i++)
+	for (int i = 0; i < emptyCellCount; i++)
 	{
 		CurPosition = emptyCellList[i];
 		makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, Player);
@@ -84,27 +101,35 @@ int minMax_HARD(int Board[][A_SIZE], int Player, int* depth)
 
 	if (Player == COMP)
 	{
-		// 컴퓨터 차례일 때는 컴퓨터의 최선의 수를 찾기 위해 max함수 호출
+
 		bestScore = Max(scoreList, emptyCellCount, emptyCellList, &bestPosition);
 	}
 
 	if (Player == HUMAN)
 	{
-		// 사람(사용자)입장에서는 컴퓨터가 최선의 수를 내면 안되니 min함수 호출
+
 		bestScore = Min(scoreList, emptyCellCount, emptyCellList, &bestPosition);
 	}
 
-	if (*depth != 0) // 재귀가 아직 끝나지 않았다면 bestScore 반환
+	if (*depth != 0)
 	{
 		return bestScore;
 	}
-	else //재귀가 끝났으면 최선의 위치를 반환 해야되므로 bestMove 반환
+	else
 	{
 		return bestPosition;
 	}
 }
 
-//컴퓨터가 최선의 수를 찾을 수 있도록 함수 중 난이도
+
+/*
+-기능 : 컴퓨터의 차례가 되면 말을 배치하는 중급난이도 함수
+-매개변수 : depth는 함수가 재귀적으로 실행될때의 재귀횟수를 저장한다.
+-반환 : 컴퓨터가 배치한 말의 인덱스를 반환한다.
+-흐름
+상급난이도까지의 흐름과 동일하지만, 빈칸이 적어지면 난이도를 낮추는 기능이 작동한다.
+*/
+
 int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 {
 	int emptyCellList[A_SIZE * A_SIZE];
@@ -113,9 +138,9 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 	int scoreList[A_SIZE * A_SIZE];
 	int bestScore;
 
-	bestScore = isAWin(Board, COMP);  // 컴퓨터의 승,무,패 확인해서 해당하는 값을 bestScore에 넣음
+	bestScore = isAWin(Board, COMP);
 
-	if (bestScore) //bestScore가 정수이므로 0이 아니면 true, 컴퓨터가 승리 또는 패배 했을 때만 return
+	if (bestScore)
 	{
 		return bestScore - *depth;
 	}
@@ -146,13 +171,11 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 
 		if (Player == COMP)
 		{
-			// 컴퓨터 차례일 때는 컴퓨터의 최선의 수를 찾기 위해 max함수 호출
 			bestScore = Max(scoreList, emptyCellCount, emptyCellList, &bestPosition);
 		}
 
 		if (Player == HUMAN)
 		{
-			// 사람(사용자)입장에서는 컴퓨터가 최선의 수를 내면 안되니 min함수 호출
 			bestScore = Min(scoreList, emptyCellCount, emptyCellList, &bestPosition);
 		}
 	}
@@ -175,7 +198,6 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 
 		if (Player == COMP)
 		{
-			// 컴퓨터가 이상한 값을 내게 함으로써사용자가 승리할 가능성을 올려준다.
 			bestScore = Min(scoreList, emptyCellCount, emptyCellList, &bestPosition);
 
 		}
@@ -188,17 +210,22 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 
 	}
 
-	if (*depth != 0) // 재귀가 아직 끝나지 않았다면 bestScore 반환
+	if (*depth != 0)
 	{
 		return bestScore;
 	}
-	else //재귀가 끝났으면 최선의 위치를 반환 해야되므로 bestMove 반환
+	else
 	{
 		return bestPosition;
 	}
 }
 
-//컴퓨터가 최선의 수를 찾을 수 있도록 함수 하난이도
+
+/*
+-기능 : 컴퓨터의 차례가 되면 보드의 빈칸을 확인하여 빈칸 중 무작위 칸에 말을 배치하는 초급난이도 함수
+-반환 : 컴퓨터가 배치한 말의 인덱스를 반환한다.
+*/
+
 int minMax_EASY(int Board[][A_SIZE], int Player)
 {
 	int emptyCellList[A_SIZE * A_SIZE];
@@ -207,7 +234,6 @@ int minMax_EASY(int Board[][A_SIZE], int Player)
 
 	srand((int)time(NULL));
 
-	
 
 	for (int i = 0; i < A_SIZE; i++)
 	{
