@@ -14,6 +14,7 @@ void initBoard(int Board[][A_SIZE])
 	}
 }
 
+
 // 보드판 출력
 void printBoard(int Board[][A_SIZE])
 {
@@ -59,6 +60,8 @@ void printBoard(int Board[][A_SIZE])
 	printf_s("\n\n");
 }
 
+
+
 //보드가 다 찼는지의 유무를 반환
 int isBoardFull(const int Board[][A_SIZE])
 {
@@ -75,6 +78,8 @@ int isBoardFull(const int Board[][A_SIZE])
 
 	return TRUE;
 }
+
+
 
 // 플레이어가 선택한 곳을 보드에 기입
 void makeMove(int Board[][A_SIZE], int Col, int Row, const int Player)
@@ -150,14 +155,41 @@ int isAWin(const int Board[][A_SIZE], const int Player)
 
 	return DRAW; // 비기는 경우
 }
+
+
+
 // 컴퓨터 차례
-void ComputerTurn(int Board[][A_SIZE], int Player)
+void ComputerTurn(int Board[][A_SIZE], int Player, int level)
 {
 	int depth = 0;
-	int bestPos = minMax(Board, Player, &depth); // 최선의 위치 선택
-	printf_s("Searched.... bestMove: %d\n", bestPos + 1);
-	makeMove(Board, bestPos / A_SIZE, bestPos % A_SIZE, COMP);
+	int bestPos;
+
+	switch (level)
+	{
+	case 1:
+		bestPos = minMax_EASY(Board, Player);				//초급모드 실행
+		break;
+
+	case 2:
+		bestPos = minMax_NORMAL(Board, Player, &depth);		//중급모드 실행
+		break;
+
+	case 3:
+		bestPos = minMax_HARD(Board, Player, &depth);		//고급모드 실행
+		break;
+
+	default:
+		printf("System Error\n");
+		bestPos = ERROR;
+		break;
+	}
+
+	makeMove(Board, bestPos/A_SIZE, bestPos%A_SIZE, Player);
+	
+
 }
+
+
 
 //사람 차례
 void HumanTurn(int Board[][A_SIZE], const int player)
@@ -186,11 +218,30 @@ void HumanTurn(int Board[][A_SIZE], const int player)
 void runGameVSCom(void)
 {
 	int Player = 0;
+	int level = 0 ;
+
+	while (level == 0)
+	{
+		
+		printf("\t난이도를 선택해주세요!!\n");
+		printf("\t      1. 초급\n");
+		printf("\t      2. 중급\n");
+		printf("\t      3. 고급\n");
+		scanf_s("%d", &level);
+		
+		
+
+		if(level<1 || level>3)
+		{
+			printf("Choose correct level\n");
+			level = 0;
+		}
+	}
 
 	printf_s("\nChoose X or O. O moves first !!\n\n");
 	while (1)
 	{
-
+		getchar();
 		char choice;
 		scanf_s("%c", &choice, sizeof(char));
 
@@ -229,7 +280,8 @@ void runGameVSCom(void)
 		}
 		else
 		{
-			ComputerTurn(Board, Player);
+			
+			ComputerTurn(Board, Player,level);
 		}
 
 		printBoard(Board);
@@ -320,17 +372,20 @@ void showMenu()
 	printf("\t      2. Player VS Computer\n");
 	
 	int choice;
-	scanf("%d", &choice);
+	scanf_s("%d", &choice);
 	getchar();
 	
 	while (!(choice == 1 || choice == 2)) { // choice가 1또는 2가 아니라면
 		printf("1또는 2를 선택해주세요!\n");
-		scanf("%d", &choice);
+		scanf_s("%d", &choice);
 		getchar();
 	}
 	
 	if (choice == 1)
+	{
+		
 		runGameVSHuman();
+	}
 	else // choice = 2
 		runGameVSCom();
 }
