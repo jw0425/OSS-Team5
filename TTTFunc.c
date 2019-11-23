@@ -40,11 +40,13 @@ void initBoard(int Board[][A_SIZE])
 void printBoard(int Board[][A_SIZE])
 {
 	int widthHeight = 6;
-	char X[6][6] = { { "X    X" },{ " X  X " },{ "  XX  " },{ "  XX  " } ,{ " X  X " } ,{ "X    X" } };
-	char O[6][6] = { { " OOOO " },{ "OO  OO" },{ "O    O" } ,{ "O    O" },{ "OO  OO" } ,{ " OOOO " } };
-	char nothing[6][6] = { { "      " },{ "      " },{ " ==== " },{ " ==== " },{ "      " },{ "      " } };
 
-
+	char X[6][6] = { {"X    X"},{" X  X "},{"  XX  "},{"  XX  "} ,{" X  X "} ,{"X    X"} };
+	char O[6][6] = { {" OOOO "},{"OO  OO"},{"O    O"} ,{"O    O"},{"OO  OO"} ,{" OOOO "} };
+	char nothing[6][6] = { {"      "},{"      "},{" ==== "},{" ==== "},{"      "},{"      "} };
+	
+	system("cls");
+	
 
 	printf_s("\n               BOARD\n\n");
 	printf_s("     1        2        3\n\n");
