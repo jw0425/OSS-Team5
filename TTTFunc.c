@@ -23,7 +23,8 @@ void printBoard(int Board[][A_SIZE])
 	char O[6][6] = { {" OOOO "},{"OO  OO"},{"O    O"} ,{"O    O"},{"OO  OO"} ,{" OOOO "} };
 	char nothing[6][6] = { {"      "},{"      "},{" ==== "},{" ==== "},{"      "},{"      "} };
 	
-
+	system("cls");
+	
 	printf_s("\n               BOARD\n\n");
 	printf_s("     1        2        3\n\n");
 	printf_s("    ---------------------------\n");
@@ -210,7 +211,6 @@ void HumanTurn(int Board[][A_SIZE], const int player)
 		}
 	}
 	makeMove(Board, inputCol, inputRow, player);
-	system("cls");
 }
 
 
