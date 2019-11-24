@@ -8,9 +8,9 @@ void printRanking() {
 	/*½Ã°£ ½Â/¹«½Â ÀÌ¸§\n*/
 	struct ranking r[5];
 
-	FILE *fp = NULL;
+	FILE *rankingFile = NULL;
 
-	fopen_s(&fp, "rank.txt", "r");
+	fopen_s(&rankingFile, "rank.txt", "r");
 
 
 	//init
@@ -23,21 +23,21 @@ void printRanking() {
 
 
 
-	if (fp != NULL)
+	if (rankingFile != NULL)
 	{
 
 		for (int i = 0; i < 5; i++)
 		{
-			if (feof(fp) == EOF) { break; }
-			fscanf_s(fp, "%f %d %d\n", &r[i].score, &r[i].status, &r[i].id);
+			if (feof(rankingFile) == EOF) { break; }
+			fscanf_s(rankingFile, "%f %d %d\n", &r[i].score, &r[i].status, &r[i].id);
 		}
 
-		fclose(fp);
+		fclose(rankingFile);
 	}
 	else
 	{
-		fopen_s(&fp, "rank.txt", "w");
-		fclose(fp);
+		fopen_s(&rankingFile, "rank.txt", "w");
+		fclose(rankingFile);
 	}
 
 	/*score status name*/
@@ -80,18 +80,18 @@ int insertRanking(float time, int status) {
 
 	int seat = -1;
 	int id = -1;
-	FILE *fp = NULL;
+	FILE *rankingFile = NULL;
 
-	fopen_s(&fp, "rank.txt", "r");
+	fopen_s(&rankingFile, "rank.txt", "r");
 
-	if (fp != NULL)
+	if (rankingFile != NULL)
 	{
 		for (int i = 0; i < 5; i++)
 		{
-			if (feof(fp) == EOF) { break; }
-			fscanf_s(fp, "%f %d %d\n", &r[i].score, &r[i].status, &r[i].id);
+			if (feof(rankingFile) == EOF) { break; }
+			fscanf_s(rankingFile, "%f %d %d\n", &r[i].score, &r[i].status, &r[i].id);
 		}
-		fclose(fp);
+		fclose(rankingFile);
 	}
 
 
@@ -133,15 +133,15 @@ int insertRanking(float time, int status) {
 		r[seat].id = id;
 		r[seat].status = status;
 
-		fopen_s(&fp, "rank.txt", "w");
+		fopen_s(&rankingFile, "rank.txt", "w");
 
 		for (int i = 0; i < 5; i++)
 		{
 			if (r[i].score == -1) { break; }
-			fprintf_s(fp, "%.2f %d %d\n", r[i].score, r[i].status, r[i].id);
+			rankingFilerintf_s(rankingFile, "%.2f %d %d\n", r[i].score, r[i].status, r[i].id);
 		}
 
-		fclose(fp);
+		fclose(rankingFile);
 	}
 
 	printf_s("Well saved!\n\n");
