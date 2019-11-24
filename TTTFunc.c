@@ -2,12 +2,7 @@
 #include <time.h>
 #include "basedef.h"
 #include "FuncDeclare.h"
-struct ranking {
-	float score;
-	int status;
-	int id;
 
-};
 void printRanking() {
 	//·©Å· ÆÄÀÏÀÇ ±¸¼º
 	/*½Ã°£ ½Â/¹«½Â ÀÌ¸§\n*/
@@ -153,9 +148,6 @@ int insertRanking(float time, int status) {
 
 	return 0;
 }
-
-
-
 
 
 /*
