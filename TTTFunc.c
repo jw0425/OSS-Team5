@@ -4,7 +4,7 @@
 #include "FuncDeclare.h"
 
 
-void printRanking() {
+void printRanking(void) {
 	//랭킹 파일의 구성
 	/*시간 승/무승 이름\n*/
 	struct ranking r[5];

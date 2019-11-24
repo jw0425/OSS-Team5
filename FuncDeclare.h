@@ -3,7 +3,8 @@
 
 #include "basedef.h"
 /*Declare of function template*/
-
+void printRanking(void);
+void insertRanking(float, int);
 void initBoard(int[][A_SIZE]);
 void printBoard(const int[][A_SIZE]);
 int isBoardFull(const int[][A_SIZE]);
