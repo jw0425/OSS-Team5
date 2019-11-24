@@ -2,7 +2,7 @@
 #include "FuncDeclare.h"
 int main(void)
 {
-	runGame();
+	showMenu();
 
 	return 0;
 }
