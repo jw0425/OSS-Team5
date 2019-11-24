@@ -30,4 +30,11 @@ enum { HUMAN, COMP, EMPTY };
 /*Default number of error*/
 #define ERROR 999
 
+/*Define ranking's element*/
+struct ranking {
+	float score;
+	int status;
+	int id;
+};
+
 #endif

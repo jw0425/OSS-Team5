@@ -1,6 +1,154 @@
 #include <stdio.h>
+#include <time.h>
 #include "basedef.h"
 #include "FuncDeclare.h"
+
+
+void printRanking() {
+	//랭킹 파일의 구성
+	/*시간 승/무승 이름\n*/
+	struct ranking r[5];
+
+	FILE *rankingFile = NULL;
+
+	fopen_s(&rankingFile, "rank.txt", "r");
+
+
+	//init
+	for (int i = 0; i < 5; i++)
+	{
+		r[i].id = -1;
+		r[i].score = -1;
+		r[i].status = -1;
+	}
+
+
+
+	if (rankingFile != NULL)
+	{
+
+		for (int i = 0; i < 5; i++)
+		{
+			if (feof(rankingFile) == EOF) { break; }
+			fscanf_s(rankingFile, "%f %d %d\n", &r[i].score, &r[i].status, &r[i].id);
+		}
+
+		fclose(rankingFile);
+	}
+	else
+	{
+		fopen_s(&rankingFile, "rank.txt", "w");
+		fclose(rankingFile);
+	}
+
+	/*score status name*/
+	printf_s("\nNow Ranking\nScore(time)\tStatus\t\tStudent ID\n");
+	for (int i = 0; i < 5; i++)
+	{
+		char status = '\0';
+		if (r[i].score == -1) { break; }
+
+		if (r[i].status == WIN)
+		{
+			status = 'W';
+		}
+		else
+		{
+			status = 'D';
+		}
+
+		printf_s("%.2f\t\t%c\t\t%d\n", r[i].score, status, r[i].id);
+	}
+
+	printf_s("\n\n");
+
+}
+
+int insertRanking(float time, int status) {
+
+	if (status == LOSE) { return 0; }
+
+	/*시간 승/무승 이름\n*/
+	struct ranking r[5];
+
+	//init
+	for (int i = 0; i < 5; i++)
+	{
+		r[i].score = -1;
+		r[i].status = -1;
+		r[i].id = -1;
+	}
+
+	int seat = -1;
+	int id = -1;
+	FILE *rankingFile = NULL;
+
+	fopen_s(&rankingFile, "rank.txt", "r");
+
+	if (rankingFile != NULL)
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			if (feof(rankingFile) == EOF) { break; }
+			fscanf_s(rankingFile, "%f %d %d\n", &r[i].score, &r[i].status, &r[i].id);
+		}
+		fclose(rankingFile);
+	}
+
+
+	for (int i = 0; i < 5; i++)
+	{
+		if (r[i].score == -1)
+		{
+			seat = i;
+			break;
+		}
+
+		if (r[i].score > time)
+		{
+			seat = i;
+			break;
+		}
+	}
+
+	if (seat == -1)
+	{
+		printf_s("Your score is not good enough to rank. Play the game faster\n\n");
+	}
+	else
+	{
+
+		printf_s("Your score is %.2f\n\n", time);
+		printf_s("Scores can be ranked. Please enter your student ID\nID(To int) : ");
+		scanf_s("%d", &id);
+		printf_s("\n\n");
+
+		for (int i = 4; i > seat; i--)
+		{
+			r[i].id = r[i - 1].id;
+			r[i].score = r[i - 1].score;
+			r[i].status = r[i - 1].status;
+		}
+
+		r[seat].score = time;
+		r[seat].id = id;
+		r[seat].status = status;
+
+		fopen_s(&rankingFile, "rank.txt", "w");
+
+		for (int i = 0; i < 5; i++)
+		{
+			if (r[i].score == -1) { break; }
+			rankingFilerintf_s(rankingFile, "%.2f %d %d\n", r[i].score, r[i].status, r[i].id);
+		}
+
+		fclose(rankingFile);
+	}
+
+	printf_s("Well saved!\n\n");
+
+	return 0;
+}
 
 /*
 - 기능 : 보드판 초기화 함수
@@ -46,10 +194,10 @@ void printBoard(int Board[][A_SIZE])
 	char nothing[6][6] = { {"      "},{"      "},{" ==== "},{" ==== "},{"      "},{"      "} };
 	
 	system("cls");
-	
+
 
 	printf_s("\n               BOARD\n\n");
-	printf_s("     1        2        3\n\n");
+	printf_s("     0        1        2\n\n");
 	printf_s("    ---------------------------\n");
 
 	for (int i = 0; i < A_SIZE; i++)
@@ -57,9 +205,10 @@ void printBoard(int Board[][A_SIZE])
 		for (int l = 0; l < widthHeight; l++)
 		{
 
-			if (l == 0) { printf_s(" %d  |", i+1); }
 
-			if (l == 0) { printf_s(" %d  |", i + 1); }
+
+			if (l == 0) { printf_s(" %d  |", i); }
+
 
 			else { printf_s("    |"); }
 
@@ -282,7 +431,9 @@ void HumanTurn(int Board[][A_SIZE], const int player)
 */
 int computerLvlSelect(void)
 {
+
 	int level=0;
+
 	while (level == 0)
 	{
 
@@ -293,8 +444,8 @@ int computerLvlSelect(void)
 		scanf_s("%d", &level);
 
 
-
 		if (level<1 || level>3)
+
 
 		{
 			printf("Choose correct level\n");
@@ -314,7 +465,10 @@ void runGameVSCom(void)
 	int Player = 0;
 	int level = computerLvlSelect();
 
-	
+
+	//프린트 랭킹
+	printRanking();
+
 
 	printf_s("\nChoose X or O. O moves first !!\n\n");
 	while (1)
@@ -345,9 +499,15 @@ void runGameVSCom(void)
 
 	int gameOver = 0;
 	int Board[A_SIZE][A_SIZE];
+	int startTime;
+	int endTime;
+	int status = -1;
 
 	initBoard(Board);
 	printBoard(Board);
+
+	//랭킹 시간 시작
+	startTime = clock();
 
 	while (!gameOver)
 	{
@@ -369,10 +529,12 @@ void runGameVSCom(void)
 			gameOver = 1;
 			if (Player == COMP)
 			{
+				status = LOSE;
 				printf_s("Computer Wins\n");
 			}
 			else
 			{
+				status = WIN;
 				printf_s("Human Wins\n");
 			}
 		}
@@ -381,11 +543,16 @@ void runGameVSCom(void)
 		{
 			printf_s("Game Over\n");
 			gameOver = 1;
+			status = DRAW;
 			printf_s("It's a Draw\n");
 		}
 
 		Player = !Player;
 	}
+
+	//랭킹 시간 끝
+	endTime = clock();
+	insertRanking((float)(endTime - startTime) / CLOCKS_PER_SEC, status);
 }
 
 
