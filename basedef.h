@@ -30,7 +30,8 @@ enum { HUMAN, COMP, EMPTY };
 
 
 /*Define ranking's element*/
-struct ranking {
+struct ranking 
+{
 	float score;
 	int status;
 	int id;

@@ -91,7 +91,7 @@ int minMax_HARD(int Board[][A_SIZE], int Player, int* depth)
 		}
 	}
 
-	int CurPosition;
+	int CurPosition = 0;
 	for (int i = 0; i < emptyCellCount; i++)
 	{
 		CurPosition = emptyCellList[i];
@@ -187,7 +187,7 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 	else
 
 	{
-		int CurPosition;
+		int CurPosition = 0;
 		for (int i = 0; i < emptyCellCount; i++)
 		{
 			CurPosition = emptyCellList[i];
@@ -229,7 +229,7 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 -기능 : 컴퓨터의 차례가 되면 보드의 빈칸을 확인하여 빈칸 중 무작위 칸에 말을 배치하는 초급난이도 함수
 -반환 : 컴퓨터가 배치한 말의 인덱스를 반환한다.
 */
-int minMax_EASY(int Board[][A_SIZE], int Player)
+int minMax_EASY(int Board[][A_SIZE])
 {
 	int emptyCellList[A_SIZE * A_SIZE] = { 0 };
 	int emptyCellCount = 0;
