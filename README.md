@@ -16,7 +16,7 @@ A game of TicTacToe implemented using Min-Max algorithm.
 ```
 
 ### Usage
-```
+
 1. 모드 선택(사람vs사람 또는 사람vs컴퓨터)
   - 사람 vs 컴퓨터 선택 시 랭킹 시스템 이용가능
   - 랭킹 시스템이란 컴퓨터랑 경기 했을 경우 게임 시간 측정 가능한 기능
@@ -30,7 +30,7 @@ A game of TicTacToe implemented using Min-Max algorithm.
 
 2-2. 사람vs컴퓨터 모드 선택시
   - 난이도 설정 화면이 표시된다. 난이도는 초급, 중급, 고급으로 나뉜다. 
-<img src="https://github.com/JeongWonLim/OSS-Team5/blob/image/dev/사용방법3.png" width="327px" height="218px" />
+<img src="https://github.com/JeongWonLim/OSS-Team5/blob/image/dev/image/사용방법3.png" width="327px" height="218px" />
 
 3. 선공 후공 결정
   - O는 선공
@@ -45,4 +45,4 @@ A game of TicTacToe implemented using Min-Max algorithm.
   - 게임의 결과를 볼 수 있습니다.
   - ID를 입력하면 랭킹에 등록 됩니다. 
 <img src="https://github.com/JeongWonLim/OSS-Team5/blob/dev/image/사용방법6.png" width="439px" height="604px" />
-```
+
