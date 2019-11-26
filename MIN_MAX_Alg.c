@@ -17,7 +17,7 @@
 */
 int Max(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 {
-	if (!emptyCellCount)
+	if (emptyCellCount==0)
 	{
 		return 0;
 	}
@@ -42,7 +42,7 @@ int Max(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 */
 int Min(int scoreList[], int emptyCellCount, int emptyCellList[], int* bestMove)
 {
-	if (!emptyCellCount)
+	if (emptyCellCount==0)
 	{
 		return 0;
 	}
@@ -74,6 +74,15 @@ int minMax_HARD(int Board[][A_SIZE], int Player, int* depth)
 	int bestPosition = 0;
 	int scoreList[A_SIZE * A_SIZE];
 	int bestScore;
+	int col, row;
+
+
+	if (booleanEmptyBoard(Board) && (Player == COMP))
+	{
+		srand((int)time(NULL));
+		bestPosition = rand() % emptyCellCount;
+		return bestPosition;
+	}
 
 	bestScore = isAWin(Board, COMP);
 
@@ -91,18 +100,22 @@ int minMax_HARD(int Board[][A_SIZE], int Player, int* depth)
 		}
 	}
 
-	int CurPosition = 0;
+
+	int CurPosition;
 	for (int i = 0; i < emptyCellCount; i++)
 	{
 		CurPosition = emptyCellList[i];
-		makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, Player);
+		col = CurPosition / A_SIZE;
+		row = CurPosition % A_SIZE;
+		makeMove(Board, col, row, Player);
 
 		(*depth)++;
-		scoreList[i] = minMax_HARD(Board, !Player, depth);
+		scoreList[i] = minMax_NORMAL(Board, !Player, depth);
 		(*depth)--;
 
-		makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, EMPTY);
+		makeMove(Board, col, row, EMPTY);
 	}
+
 
 	if (Player == COMP)
 	{
@@ -141,6 +154,14 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 	int bestPosition = 0;
 	int scoreList[A_SIZE * A_SIZE];
 	int bestScore;
+	int col , row;
+
+	if (booleanEmptyBoard(Board) && (Player==COMP))
+	{
+		srand((int)time(NULL));
+		bestPosition = rand() % emptyCellCount;
+		return bestPosition;
+	}
 
 	bestScore = isAWin(Board, COMP);
 
@@ -158,21 +179,23 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 		}
 	}
 
+	int CurPosition;
+	for (int i = 0; i < emptyCellCount; i++)
+	{
+		CurPosition = emptyCellList[i];
+		col = CurPosition / A_SIZE;
+		row = CurPosition % A_SIZE;
+		makeMove(Board, col, row, Player);
+
+		(*depth)++;
+		scoreList[i] = minMax_NORMAL(Board, !Player, depth);
+		(*depth)--;
+
+		makeMove(Board, col, row, EMPTY);
+	}
+
 	if (emptyCellCount >= (A_SIZE*A_SIZE / 2))
 	{
-		int CurPosition;
-		for (int i = 0; i < emptyCellCount; i++)
-		{
-			CurPosition = emptyCellList[i];
-			makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, Player);
-
-			(*depth)++;
-			scoreList[i] = minMax_NORMAL(Board, !Player, depth);
-			(*depth)--;
-
-			makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, EMPTY);
-		}
-
 		if (Player == COMP)
 		{
 			bestScore = Max(scoreList, emptyCellCount, emptyCellList, &bestPosition);
@@ -187,19 +210,6 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 	else
 
 	{
-		int CurPosition = 0;
-		for (int i = 0; i < emptyCellCount; i++)
-		{
-			CurPosition = emptyCellList[i];
-			makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, Player);
-
-			(*depth)++;
-			scoreList[i] = minMax_HARD(Board, !Player, depth);
-			(*depth)--;
-
-			makeMove(Board, CurPosition / A_SIZE, CurPosition % A_SIZE, EMPTY);
-		}
-
 		if (Player == COMP)
 		{
 			bestScore = Min(scoreList, emptyCellCount, emptyCellList, &bestPosition);
@@ -211,7 +221,6 @@ int minMax_NORMAL(int Board[][A_SIZE], int Player, int* depth)
 
 			bestScore = Max(scoreList, emptyCellCount, emptyCellList, &bestPosition);
 		}
-
 	}
 
 	if (*depth != 0)
@@ -246,13 +255,34 @@ int minMax_EASY(int Board[][A_SIZE])
 				emptyCellList[emptyCellCount++] = i * A_SIZE + j;
 		}
 	}
-
+	
 	bestPosition = rand() % emptyCellCount;
 
 	return emptyCellList[bestPosition];
 }
 
 
+/*
+-기능 : 보드의 공백 여부를 반환한다.
+-반환 : 공백이라면 TRUE , 공백이 아니라면 FALSE를 반환
+*/
+int booleanEmptyBoard(int Board[][A_SIZE])
+{
+	int emptyCheck = 0;
 
+	int i,j;
 
+	for (i = 0; (i < A_SIZE) && (emptyCheck==0); i++)
+	{
+		for (j = 0; (j < A_SIZE) && (emptyCheck == 0) ; j++)
+		{
+			if (Board[i][j] != EMPTY)
+				emptyCheck++;
+		}
+	}
+	if (emptyCheck == 0)
+		return TRUE;
+	else
+		return FALSE;
 
+}

@@ -419,6 +419,7 @@ void ComputerTurn(int Board[][A_SIZE], int Player, int level)
 {
 	int depth = 0;
 	int bestPos = 0;
+	int col, row;
 
 	switch (level)
 	{
@@ -439,7 +440,9 @@ void ComputerTurn(int Board[][A_SIZE], int Player, int level)
 		bestPos = ERROR;
 		break;
 	}
-	makeMove(Board, bestPos / A_SIZE, bestPos % A_SIZE, Player);
+	col = bestPos / A_SIZE;
+	row = bestPos % A_SIZE;
+	makeMove(Board, col, row, Player);
 }
 
 /*
