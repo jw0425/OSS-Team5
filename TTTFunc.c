@@ -12,6 +12,19 @@
 #include "basedef.h"
 #include "FuncDeclare.h"
 
+ /*
+ -기능 : 입력 버퍼 초기화
+ */
+void clear_stdin() {
+	int ch;
+	while ((ch = getchar()) != EOF && ch != '\n') {};
+}
+
+/*
+-기능 : 입력값이 유요한 위치인지 검사
+-반환 : 입력값이 0보다 크고 A_SIZE보다 작은경우 참 반환
+		그 외 입력값은 거짓 반환
+*/
 int validPosition(const int Board[][A_SIZE], int inputCol, int inputRow)
 {
 	if (0 > inputCol || inputCol >= A_SIZE)
@@ -24,14 +37,13 @@ int validPosition(const int Board[][A_SIZE], int inputCol, int inputRow)
 	return TRUE;
 }
 
-
-void printRanking(void) 
+void printRanking(void)
 {
 	//랭킹 파일의 구성
 	/*시간 승/무승 이름\n*/
 	struct ranking r[5];
 
-	FILE *rankingFile = NULL;
+	FILE* rankingFile = NULL;
 
 	fopen_s(&rankingFile, "rank.txt", "r");
 
@@ -105,7 +117,7 @@ int insertRanking(float time, int status)
 
 	int seat = -1;
 	int id = -1;
-	FILE *rankingFile = NULL;
+	FILE* rankingFile = NULL;
 
 	fopen_s(&rankingFile, "rank.txt", "r");
 
@@ -174,6 +186,7 @@ int insertRanking(float time, int status)
 	return 0;
 }
 
+
 /*
 - 기능 : 콘솔창 글씨를 모두 삭제
 */
@@ -181,6 +194,7 @@ void consoleClear(void)
 {
 	system("cls");
 }
+
 
 /*
 - 기능 : 보드판 초기화 함수
@@ -221,11 +235,11 @@ void printBoard(const int Board[][A_SIZE])
 {
 	int widthHeight = 6;
 
-	char X[6][6] = { {"X    X"},{" X  X "},{"  XX  "},{"  XX  "} ,{" X  X "} ,{"X    X"} };
-	char O[6][6] = { {" OOOO "},{"OO  OO"},{"O    O"} ,{"O    O"},{"OO  OO"} ,{" OOOO "} };
-	char nothing[6][6] = { {"      "},{"      "},{" ==== "},{" ==== "},{"      "},{"      "} };
-	
-	system("cls");
+	char X[6][7] = { {"X    X"},{" X  X "},{"  XX  "},{"  XX  "} ,{" X  X "} ,{"X    X"} };
+	char O[6][7] = { {" OOOO "},{"OO  OO"},{"O    O"} ,{"O    O"},{"OO  OO"} ,{" OOOO "} };
+	char nothing[6][7] = { {"      "},{"      "},{" ==== "},{" ==== "},{"      "},{"      "} };
+
+	consoleClear();
 
 
 	printf_s("\n               BOARD\n\n");
@@ -236,30 +250,30 @@ void printBoard(const int Board[][A_SIZE])
 	{
 		for (int l = 0; l < widthHeight; l++)
 		{
-			if (l == 0) 
+			if (l == 0)
 			{
-				printf_s(" %d  |", i); 
+				printf_s(" %d  |", i);
 			}
-			else 
-			{ 
-				printf_s("    |"); 
+			else
+			{
+				printf_s("    |");
 			}
 
 			for (int j = 0; j < A_SIZE; j++)
 			{
 				int status = Board[i][j];
 
-				for (int k = 0; k < widthHeight; k++) 
+				for (int k = 0; k < widthHeight; k++)
 				{
-					if (status == 0) 
+					if (status == 0)
 					{
 						printf_s("%c", O[l][k]);
 					}
-					else if (status == 1) 
+					else if (status == 1)
 					{
 						printf_s("%c", X[l][k]);
 					}
-					else 
+					else
 					{
 						printf_s("%c", nothing[l][k]);
 					}
@@ -273,6 +287,7 @@ void printBoard(const int Board[][A_SIZE])
 
 	printf_s("\n\n");
 }
+
 
 /*
 -기능 : 보드 원소가 빈 공간으로 할당된 ㅇ것이 있는지 확인하는 기능
@@ -312,11 +327,12 @@ void makeMove(int Board[][A_SIZE], int Col, int Row, const int Player)
 /*
 -기능 : 가로, 세로, 대각선으로 3개의 동일한 심볼을 확인
 -반환 : 3개가 연속적으로 동일할 때 : TRUE,  불연속일 때 : FALSE
--예시 : 대각선 일치	가로 일치	세로 일치	 불일치
-
-		 O O X 		 O O O		 O X O		 O X O
-		 O X O		 O X X		 X X O		 X O O
-		 X O X		 X O X		 O X X		 O X X
+-예시 :  대각선 일치	가로 일치	세로 일치	 불일치
+	    우측상단에서
+	   	 좌측하단
+		  O O X      O O O		 O X O		 O X O
+		  O X O		 O X X		 X X O		 X O O
+		  X O X		 X O X		 O X X		 O X X
 
 */
 int is3inARow(const int Board[][A_SIZE], const int Player)
@@ -333,30 +349,33 @@ int is3inARow(const int Board[][A_SIZE], const int Player)
 
 		for (int j = 0; j < A_SIZE; j++)
 		{
-			if (Board[i][j] == Player)
+			if (Board[i][j] == Player) //가로
 			{
 				rowCount++;
 			}
-			if (Board[j][i] == Player)
+			if (Board[j][i] == Player) //세로
 			{
 				columnCnt++;
 			}
 			if (i == j)
 			{
-				if (Board[i][j] == Player)
+				if (Board[i][j] == Player) // 좌측 상단에서 우측 하단으로의 대각선
 					downDiagonalCnt++;
 			}
 
 			if (i + j + 1 == A_SIZE)
 			{
-				if (Board[i][j] == Player)
+				if (Board[i][j] == Player) // 우측상단에서 좌측하단으로의 대각선
 				{
 					upDiagonalCnt++;
 				}
 			}
 		}
+
 		if (rowCount == A_SIZE || columnCnt == A_SIZE || downDiagonalCnt == A_SIZE || upDiagonalCnt == A_SIZE)
+		{
 			return TRUE;
+		}
 	}
 
 	return FALSE;
@@ -399,7 +418,7 @@ int isAWin(const int Board[][A_SIZE], const int Player)
 void ComputerTurn(int Board[][A_SIZE], int Player, int level)
 {
 	int depth = 0;
-	int bestPos;
+	int bestPos = 0;
 
 	switch (level)
 	{
@@ -420,7 +439,7 @@ void ComputerTurn(int Board[][A_SIZE], int Player, int level)
 		bestPos = ERROR;
 		break;
 	}
-	makeMove(Board, bestPos / A_SIZE, bestPos%A_SIZE, Player);
+	makeMove(Board, bestPos / A_SIZE, bestPos % A_SIZE, Player);
 }
 
 /*
@@ -429,21 +448,22 @@ void ComputerTurn(int Board[][A_SIZE], int Player, int level)
 */
 void HumanTurn(int Board[][A_SIZE], const int player)
 {
-	printf_s("\nEnter your move !!\n\n");
-	int inputCol, inputRow;
+	printf_s("\n위치를 입력해주세요 : ");
+	int inputCol = -1, inputRow =-1;
 	while (1)
 	{
 		scanf_s("%d %d", &inputCol, &inputRow);
 
-		if (validPosition(Board,inputCol, inputRow))
+		if (validPosition(Board, inputCol, inputRow))
 		{
-				break;
+			break;
 		}
 		else
 		{
-			printf_s("try again : ");
+			clear_stdin();
+			printf_s("위치를 다시 입력해주세요 : ");
 		}
-		
+
 	}
 	makeMove(Board, inputCol, inputRow, player);
 }
@@ -454,59 +474,56 @@ void HumanTurn(int Board[][A_SIZE], const int player)
 */
 int computerLvlSelect(void)
 {
+	int level = 0;
 
-	int level=0;
+	printTitle();
+	printf_s("\n\t\t   *****난이도!!*****\n");
+	printf_s("\t\t   *     1. 초급    *\n");
+	printf_s("\t\t   *     2. 중급    *\n");
+	printf_s("\t\t   *     3. 고급    *\n");
+	printf_s("\t\t   ******************\n\n");
+	printf_s("난이도를 입력해주세요 : ");
 
 	while (level == 0)
 	{
-		printf("\n\n\n\t난이도를 선택해주세요!!\n");
-		printf("\t      1. 초급\n");
-		printf("\t      2. 중급\n");
-		printf("\t      3. 고급\n");
 		scanf_s("%d", &level);
 
-		consoleClear();
-
-		if (level<1 || level>3)
+		if (level < 1 || level>3)
 		{
-			printf("Choose correct level\n");
+			printf("난이도를 다시 입력해주세요 : ");
 			level = 0;
 		}
+		clear_stdin();
 	}
+
+	consoleClear();
 
 	return level;
 }
 
 /*
--기능 : 사람 VS 컴퓨터 대결인 경우
+-기능 : 사람 VS 컴퓨터 대결
 */
 void runGameVSCom(void)
 {
 	int Player = 0;
 	int level = computerLvlSelect();
 
-
 	//프린트 랭킹
 	printRanking();
-
 
 	printf_s("\nChoose X or O. O moves first !!\n\n");
 	while (1)
 	{
-		getchar();
 		char choice;
 		scanf_s("%c", &choice, sizeof(char));
-
-		getchar();
 
 		if (choice == 'O')
 		{
 			Player = HUMAN;
-
 			break;
 		}
-
-		if (choice == 'X')
+		else if (choice == 'X')
 		{
 			Player = COMP;
 			break;
@@ -515,6 +532,7 @@ void runGameVSCom(void)
 		{
 			printf_s("Choose correct symbols\n");
 		}
+		clear_stdin();
 	}
 
 	int gameOver = 0;
@@ -577,7 +595,7 @@ void runGameVSCom(void)
 
 
 /*
--기능 : 사람 VS 사람 대결인 경우
+-기능 : 사람 VS 사람 대결
 */
 void runGameVSHuman(void)
 {
@@ -632,6 +650,21 @@ void runGameVSHuman(void)
 	}
 }
 
+void printTitle(void)
+{
+	printf_s("\n\n");
+	printf_s("  #####  #   ###    #####   #     ###     #####  ###   #####\n");
+	printf_s("    #       #         #    # #   #          #   #   #  #    \n");
+	printf_s("    #    #  #         #   #####  #          #   #   #  ###  \n");
+	printf_s("    #    #  #         #   #   #  #          #   #   #  #    \n");
+	printf_s("    #    #   ###      #   #   #   ###       #    ###   #####\n\n");
+
+	printf_s("                ###    #    ##   ##  #####\n");
+	printf_s("               #      # #   #  #  #  #    \n");
+	printf_s("               # ##  #####  #  #  #  ###  \n");
+	printf_s("               #  #  #   #  #  #  #  #    \n");
+	printf_s("                ###  #   #  #     #  #####\n\n");
+}
 
 /*
 -기능 : 초기 메뉴 화면을 출력
@@ -639,20 +672,21 @@ void runGameVSHuman(void)
 void showMenu()
 {
 	int choice = 0;
+	
+	printTitle();
+
+	printf_s("\t\t 모드를 선택해 주세요.\n\n");
+	printf_s("\t\t 1. Player VS Player\n");
+	printf_s("\t\t 2. Player VS Computer\n\n");
+
 	while (!(choice == 1 || choice == 2)) // choice가 1또는 2가 아니라면
 	{
-		printf("\n\n\n\t\tTicTacToe Game\n\n");
-		printf("\t     모드를 선택해 주세요.\n\n");
-		printf("\t      1. Player VS Player\n");
-		printf("\t      2. Player VS Computer\n");
-		scanf_s("%d", &choice);
-		
 		if (!(choice == 1 || choice == 2))
 		{
-			consoleClear();
-			printf("1또는 2를 선택해주세요!\n");
+			printf_s("1또는 2를 선택해주세요! : ");
 		}
-		
+		scanf_s("%d", &choice);
+		clear_stdin();
 	}
 
 	consoleClear();
@@ -662,5 +696,7 @@ void showMenu()
 		runGameVSHuman();
 	}
 	else // choice = 2
+	{
 		runGameVSCom();
+	}
 }
