@@ -30,8 +30,11 @@ void printTitle(void);
 /*Declare of function template in MIN_MAX_Alg.c*/
 int Max(int[], int, int[], int*);
 int Min(int[], int, int[], int*);
-int minMax_EASY(int[][A_SIZE], int);
+int minMax_EASY(int[][A_SIZE]);
 int minMax_NORMAL(int[][A_SIZE], int, int*);
 int minMax_HARD(int[][A_SIZE], int, int*);
 int computerLvlSelect(void);
+int booleanEmptyBoard(int Board[][A_SIZE]);
+
+
 #endif
